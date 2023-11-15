@@ -5,7 +5,7 @@ from tqdm import tqdm
 def generate_prompts(input_file, output_file):
     prompts = {}
     objects = {}
-    
+
     with open(input_file, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -45,8 +45,10 @@ def generate_prompts(input_file, output_file):
                                 new_prompts.append(temp_prompt)
                         temp_prompts = new_prompts
 
-                    for temp_prompt in temp_prompts:
-                        output.append({"category": category, "prompt": temp_prompt})
+                    output.extend(
+                        {"category": category, "prompt": temp_prompt}
+                        for temp_prompt in temp_prompts
+                    )
                 else:
                     for obj_type, obj_list in objects.items():
                         if "{" + obj_type + "}" in prompt:
@@ -85,9 +87,9 @@ def sample_prompts(input_file, output_file, sample_count):
         else:
             samples = prompt_list
 
-        for prompt in samples:
-            sampled_prompts.append({"category": category, "prompt": prompt})
-
+        sampled_prompts.extend(
+            {"category": category, "prompt": prompt} for prompt in samples
+        )
     with open(output_file, 'w', newline='') as csvfile:
         fieldnames = ['category', 'prompt']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
